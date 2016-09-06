@@ -238,6 +238,134 @@
             
               
                 
+                <a class="post-title-link" href="/2016/09/06/Android 4.4 以上沉浸式状态栏实现/" itemprop="url">
+                  未命名
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-06T22:01:52+08:00" content="2016-09-06">
+              2016-09-06
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/06/Android 4.4 以上沉浸式状态栏实现/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/06/Android 4.4 以上沉浸式状态栏实现/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Android-4-4-以上沉浸式状态栏实现"><a href="#Android-4-4-以上沉浸式状态栏实现" class="headerlink" title="Android 4.4 以上沉浸式状态栏实现"></a>Android 4.4 以上沉浸式状态栏实现</h1><p>这几天看了很多关于沉浸式状态栏的实现方案，总的在此汇总整理一下。</p>
+<blockquote>
+<p><strong>沉浸</strong> 就是让人专注在当前的目标（由设计者营造）情境下感到愉悦和满足，而忘记真实世界的情境。<br>移植到此处讲，就是尽可能隐藏掉手机的状态信息，使得用户完全沉浸在当前的情景中。</p>
+</blockquote>
+<p>参考：[Android沉浸式状态栏]（<a href="http://www.jianshu.com/p/aca4fd6743b1）" target="_blank" rel="external">http://www.jianshu.com/p/aca4fd6743b1）</a></p>
+<blockquote>
+<p>使用：<code>WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS</code>，<code>Added in API level 19</code>，如果这个flag被设置，<code>View.SYSTEM_UI_FLAG_LAYOUT_STABLE</code> 和 <code>View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN</code> 这两个flag会被自动添加到system UI visibility中。</p>
+</blockquote>
+<p>理解一下两点对于下面的阐述很重要：</p>
+<ul>
+<li><strong>一旦这个Flag被设置，则状态栏就变透明，而且是被内容布局覆盖住</strong></li>
+<li><strong>fitsSystemWindows = “true” 用于控制是否为状态栏留出空间</strong></li>
+</ul>
+<hr>
+<p>[TOC]</p>
+<hr>
+<p>以下，我分三种情况进行阐述:</p>
+<p>###1. 把状态栏用APP的主色调纯色覆盖<br>效果如图所示：<br><img src="./immesive_main.jpg" alt="@纯色状态栏|300*500"></p>
+<p>首先设置状态栏透明（半透明）</p>
+<p>然后创建一个与<code>statusBar</code>等高的<code>view</code>，设置背景色,并添加到布局中，然后获取根布局，设置<code>FitsSystemWindow</code>和<code>ClipToPadding</code>为<code>true</code>。在添加上面的Flag时，会使得内容布局覆盖在<code>statusBar</code>上方，两者重叠，故使用<code>FitsSystemWindow</code>来调整出一个位置，使内容居于状态栏下方。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">* creat a view which is as high as status bar</div><div class="line">**/</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> View <span class="title">createStatuView</span><span class="params">(Activity activity,<span class="keyword">int</span> color)</span></span>&#123;</div><div class="line">        <span class="comment">//获取状态栏高度</span></div><div class="line">        <span class="keyword">int</span> statusBarHeight = getStatusBarHeight(activity);</div><div class="line"></div><div class="line">        View statusView = <span class="keyword">new</span> View(activity);</div><div class="line">        LinearLayout.LayoutParams params = <span class="keyword">new</span> LinearLayout.LayoutParams(</div><div class="line">        ViewGroup.LayoutParams.MATCH_PARENT,statusBarHeight);</div><div class="line">        statusView.setLayoutParams(params);</div><div class="line">        statusView.setBackgroundColor(color);</div><div class="line">        <span class="keyword">return</span> statusView;</div><div class="line">    &#125;</div><div class="line"><span class="comment">/**</span></div><div class="line"> * </div><div class="line">**/</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setStatusColor</span><span class="params">(Activity activity,<span class="keyword">int</span> color)</span></span>&#123;</div><div class="line">        <span class="keyword">if</span>(Build.VERSION.SDK_INT&lt;Build.VERSION_CODES.LOLLIPOP)&#123;</div><div class="line">            <span class="comment">//小于5.0，5.0及以上创建工程时就默认使用colorPrimary的颜色，故不必再作考虑</span></div><div class="line">            <span class="comment">//设置状态栏透明</span></div><div class="line">            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);</div><div class="line">            View statusView = createStatuView(activity,color);</div><div class="line"></div><div class="line">            <span class="comment">//添加statusview到布局中</span></div><div class="line">            ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();</div><div class="line">            decorView.addView(statusView);</div><div class="line"></div><div class="line">            <span class="comment">//设置根布局</span></div><div class="line">            ViewGroup rootView = (ViewGroup)((ViewGroup) activity</div><div class="line">            .findViewById(android.R.id.content)).getChildAt(<span class="number">0</span>);</div><div class="line">            rootView.setFitsSystemWindows(<span class="keyword">true</span>);</div><div class="line">            rootView.setClipToPadding(<span class="keyword">true</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getStatusBarHeight</span><span class="params">(Activity activity)</span></span>&#123;</div><div class="line">        <span class="keyword">int</span> resourceId = activity.getResources()</div><div class="line">        .getIdentifier(<span class="string">"status_bar_height"</span>,<span class="string">"dimen"</span>,<span class="string">"android"</span>);</div><div class="line">        <span class="keyword">int</span> height =  activity.getResources().getDimensionPixelOffset(resourceId);</div><div class="line">        Log.i(<span class="string">"status bar "</span>,<span class="string">"height :"</span>+height);</div><div class="line">        <span class="keyword">return</span> height;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>最后只需在<code>activity</code>中调用<code>setStatusColor(activity,color)</code>即可。</p>
+<p>###2. 使用图片做背景，并是内容延伸至状态栏<br>效果如图所示：<br><img src="./picture.jpg" alt="@图片延伸至状态栏|300*500"></p>
+<p>首先，与上面的一样，添加状态栏透明Flag，实现了全屏效果，内容布局直接覆盖了<code>statusBar</code>,背景图片就自然地延伸到状态栏，再对根布局进行设置以空出<code>statusBar</code>的位置，使得内容布局居于状态栏下方。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">this</span>.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);</div><div class="line">        <span class="comment">// setup rootview</span></div><div class="line">        ViewGroup rootview = (ViewGroup) ((ViewGroup) findViewById(android.R.id.content)).getChildAt(<span class="number">0</span>);</div><div class="line">        rootview.setFitsSystemWindows(<span class="keyword">true</span>);</div><div class="line">        rootview.setClipToPadding(<span class="keyword">true</span>);</div></pre></td></tr></table></figure></p>
+<h3 id="3-在DrawerLayout中应用"><a href="#3-在DrawerLayout中应用" class="headerlink" title="3. 在DrawerLayout中应用"></a>3. 在DrawerLayout中应用</h3><p>效果如图所示：<br><img src="./drawer_main.jpg" alt="@内容页|300*500"><img src="./drawer.jpg" alt="@抽屉页|right|300*500"></p>
+<p><code>DrawerLayout</code>布局包含两个字<code>view</code>,一个是内容，一个是抽屉。在这个布局文件中，根节点设置<code>android:fitsSystemWindows=&quot;false&quot;</code><br>内容主要包含一个<code>ToolBar</code>和一个<code>FrameLayout</code>，其中，<code>ToolBar</code>由一个<code>AppBarLayout</code>包裹<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">android.support.design.widget.CoordinatorLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></div><div class="line">    <span class="attr">xmlns:app</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></div><div class="line">    <span class="attr">xmlns:tools</span>=<span class="string">"http://schemas.android.com/tools"</span></div><div class="line">    <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></div><div class="line">    <span class="attr">android:fitsSystemWindows</span>=<span class="string">"false"</span></div><div class="line">    <span class="attr">tools:context</span>=<span class="string">"com.njrobot.huangyouqiang.immersive.DrawerActivity"</span>&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">android.support.design.widget.AppBarLayout</span></span></div><div class="line">        <span class="attr">android:id</span>=<span class="string">"@+id/toolbarWrapper"</span></div><div class="line">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></div><div class="line">        <span class="attr">android:theme</span>=<span class="string">"@style/AppTheme.AppBarOverlay"</span>&gt;</div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">android.support.v7.widget.Toolbar</span></span></div><div class="line">            <span class="attr">android:id</span>=<span class="string">"@+id/toolbar"</span></div><div class="line">            <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></div><div class="line">            <span class="attr">android:layout_height</span>=<span class="string">"?attr/actionBarSize"</span></div><div class="line">            <span class="attr">android:background</span>=<span class="string">"?attr/colorPrimary"</span></div><div class="line">            <span class="attr">app:popupTheme</span>=<span class="string">"@style/AppTheme.PopupOverlay"</span> /&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="name">android.support.design.widget.AppBarLayout</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">layout</span>=<span class="string">"@layout/content_drawer"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">android.support.design.widget.CoordinatorLayout</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>第一步还是添加<code>FLAG_TRANSLUCENT_STATUS</code>。<br><strong>这里设置</strong><code>fitsSystemWindows=&quot;false&quot;</code>,是因为这里不采用添加一个<code>view</code>的方式来实现，而是采用给<code>AppBarLayout</code>动态设置<code>paddingTop</code>,数值为状态栏的高度，这样<code>ToolBar</code>的上方就空出一块与状态栏等高的区域，且颜色也是相同的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);</div><div class="line">AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.toolbarWrapper);</div><div class="line">appBarLayout.setPadding(<span class="number">0</span>,getStatusBarHeight(<span class="keyword">this</span>),<span class="number">0</span>,<span class="number">0</span>);</div></pre></td></tr></table></figure></p>
+<p>而抽屉那一块因为没有设置<code>paddingTop</code>,所以整个都移上去，因为抽屉布局都已经固定，所以不必担心抽屉上的内容跟状态栏重叠。</p>
+<h3 id="4-最后"><a href="#4-最后" class="headerlink" title="4. 最后"></a>4. 最后</h3><p>至此，基本完成通常情境下的需求。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/07/25/关于ANDROID 的 AIDL的使用/" itemprop="url">
                   关于ANDROID的AIDL的使用
                 </a>
@@ -618,7 +746,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-count">4</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
