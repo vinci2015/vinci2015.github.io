@@ -1,0 +1,799 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Android Studio 使用 AspectJ 实践AOP
+                        
+                    
+
+
+ 
+Android Studio   官方暂时不支持aspectJ，不过这里用的一款gradle插件 aspectjx
+
+
+
+配置
+
+在project的build.gradle里配置插件
+
+
+
+
+     dependencies {">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Studio 使用 AspectJ 实践AOP">
+<meta property="og:url" content="http://vinci2015.github.io/2016/09/29/Android Studio 使用 AspectJ 实践AOP/index.html">
+<meta property="og:site_name" content="Image Your future">
+<meta property="og:description" content="Android Studio 使用 AspectJ 实践AOP
+                        
+                    
+
+
+ 
+Android Studio   官方暂时不支持aspectJ，不过这里用的一款gradle插件 aspectjx
+
+
+
+配置
+
+在project的build.gradle里配置插件
+
+
+
+
+     dependencies {">
+<meta property="og:updated_time" content="2016-09-29T14:43:47.498Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Studio 使用 AspectJ 实践AOP">
+<meta name="twitter:description" content="Android Studio 使用 AspectJ 实践AOP
+                        
+                    
+
+
+ 
+Android Studio   官方暂时不支持aspectJ，不过这里用的一款gradle插件 aspectjx
+
+
+
+配置
+
+在project的build.gradle里配置插件
+
+
+
+
+     dependencies {">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://vinci2015.github.io/2016/09/29/Android Studio 使用 AspectJ 实践AOP/"/>
+
+  <title> Android Studio 使用 AspectJ 实践AOP | Image Your future </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Image Your future</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android Studio 使用 AspectJ 实践AOP
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-29T22:39:03+08:00" content="2016-09-29">
+              2016-09-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/android/" itemprop="url" rel="index">
+                    <span itemprop="name">android</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/29/Android Studio 使用 AspectJ 实践AOP/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/29/Android Studio 使用 AspectJ 实践AOP/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+              &nbsp; | &nbsp;
+              <span class="page-pv"><i class="fa fa-file-o">本文总阅读量</i>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+              </span>
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <!DOCTYPE html><html><head><title>Android Studio 使用 AspectJ 实践AOP</title><meta charset="utf-8"><link href="https://dn-maxiang.qbox.me/res-min/themes/marxico.css" rel="stylesheet"><style></style></head><body><div id="preview-contents" class="note-content">
+                        
+                    
+
+
+<p> <br>
+Android Studio   官方暂时不支持aspectJ，不过这里用的一款<code>gradle</code>插件 <code>aspectjx</code></p>
+
+
+
+<h3 id="配置"><em>配置</em></h3>
+
+<ol start="1"><li rel="1">在project的build.gradle里配置插件</li>
+</ol>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-gradle hljs">     <span class="hljs-keyword">dependencies</span> {<br>        <span class="hljs-keyword">classpath</span> <span class="hljs-string">'com.android.tools.build:gradle:2.1.3'</span><br>        <span class="hljs-comment">//if i update the gradle plugin version above to 2.2.0,it will runs out with a problerm</span><br>        <span class="hljs-keyword">classpath</span> <span class="hljs-string">'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:1.0.7'</span><br>    }<br></code></pre>
+
+<ol start="2"><li rel="2">在主module中添加 <code>apply plugin:'android-aspectjx'</code>,在<code>android</code>闭包中添加</li>
+</ol>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-gradle hljs">  aspectjx {<br>        <span class="hljs-comment">//指定只对含有关键字'DataBindingDemo/aspectjlibrary'的库进行织入扫描，忽略其他库，提升编译效率</span><br>        includeJarFilter <span class="hljs-string">'DataBindingDemo/aspectjlibrary'</span><br>        <span class="hljs-comment">//排除对universal-image-loader'库的织入扫描</span><br>        <span class="hljs-comment">//  excludeJarFilter 'universal-image-loader' </span><br>    }<br></code></pre>
+
+<ol start="3"><li rel="3">在使用了<code>aspectj</code> 的module中添加一下依赖：</li>
+</ol>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-gradle hljs"> <span class="hljs-keyword">compile</span> <span class="hljs-string">'org.aspectj:aspectjrt:1.8.9'</span><br></code></pre>
+
+
+
+<h3 id="应用"><em>应用</em></h3>
+
+<p><code>aspect</code> 主要用于AOP编程，应用在日志，监控，性能检查方面，并可以做到<strong>无侵入</strong>。 <br>
+首先是3个概念： <br>
+ <strong>JoinPoint</strong> ：表示程序运行过程中的一些执行点，包括函数调用，函数内部执行等。。。 <br>
+ <strong>PointCut</strong> :   用于定位到指定的<code>JoinPoint</code> <br>
+ <strong>Advice</strong>   :  要织入到指定位置的代码片段</p>
+
+<p>新建一个Module，专门用于编写Aspectj代码，将该Module申明成<code>android library</code>,主Module中添加该依赖库。 <br>
+新建一个类 <code>ActivityAspect</code>,在类名上添加注解<code>@Aspect</code>。声明一个<code>PointCut</code>:</p>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-aspectj hljs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String MainMethod = <span class="hljs-string">"* com.github.huangyouqiang.aspectjlibrary.databindingdemo.MainActivity.*(..)"</span><br><span class="hljs-annotation">@Pointcut</span>(<span class="hljs-string">"execution(MainMethod)"</span>)<br><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">mainmethod</span><span class="hljs-params">()</span></span>{}<br></code></pre>
+
+<p>其中MainMethod表示匹配<code>MainActivity</code>中的所有方法。具体语法如下：</p>
+
+<blockquote>
+  <p><code>Method Signature</code>: <br>
+    语法： @注解 访问权限 返回值的类型 包名.函数名(参数) <br>
+  @注解 和 访问权限public/private/protect，以及static/final）属于可选项。如果不设置它们，则默认都会选择。以访问权限       为例，如果没有设置访问权限作为条件，那么public，private，protect及static、final的函数都会进行搜索。 <br>
+    返回值类型就是普通的函数的返回值类型。如果不限定类型的话，就用*通配符表示 <br>
+  Ž  包名.函数名用于查找匹配的函数。可以使用通配符，包括<em>和..以及+号。其中</em>号用于匹配除.号之外的任意字符，而..则表示任   意子package，+号表示子类。 <br>
+       比如： <br>
+       java.*.Date：可以表示java.sql.Date，也可以表示java.util.Date <br>
+       Test*：可以表示TestBase，也可以表示TestDervied <br>
+       java..*：表示java任意子类 <br>
+       java..*Model+：表示Java任意package中名字以Model结尾的子类，比如TabelModel，TreeModel等 <br>
+    最后来看函数的参数。参数匹配比较简单，主要是参数类型，比如： <br>
+       (int, char)：表示参数只有两个，并且第一个参数类型是int，第二个参数类型是char <br>
+       (String, ..)：表示至少有一个参数。并且第一个参数类型是String，后面参数类型不限。在参数匹配中， <br>
+       ..代表任意参数个数和类型 <br>
+       (Object …)：表示不定个数的参数，且类型都是Object，这里的…不是通配符，而是Java中代表不定参数的意思  <br>
+  <code>Constructor signature</code>: <br>
+  和Method Signature类似，只不过构造函数没有返回值，而且函数名必须叫new。比如： <br>
+  public *..TestDerived.new(..)： <br>
+  Œ  public：选择public访问权限 <br>
+    *..代表任意包名 <br>
+  Ž  TestDerived.new：代表TestDerived的构造函数 <br>
+    (..)：代表参数个数和类型都是任意 <br>
+  <code>Field Signature</code>： <br>
+  @注解 访问权限 类型 类名.成员变量名 <br>
+  Œ  其中，@注解和访问权限是可选的 <br>
+    类型：成员变量类型，*代表任意类型 <br>
+  Ž  类名.成员变量名：成员变量名可以是*，代表任意成员变量 <br>
+  比如， <br>
+  set(int test..TestBase.base)：表示设置TestBase.base变量时的JPoint <br>
+  <code>Type Signature</code>:  <br>
+  staticinitialization(test..TestBase)：表示TestBase类的static block <br>
+  handler(NullPointerException)：表示catch到NullPointerException的JPoint.</p>
+</blockquote>
+
+<p><code>@Pointcut()</code>定义了一个PointCut，注解了一个方法<code>public void mainmethod(){}</code>,此处这个方法不需要具体实现，此方法变代表了这个PointCut，下面会用到。<code>execution</code>表示为该匹配为该函数类型的<code>JoinPoint</code>的内部执行。 <br>
+结合上述的解释，可以得出该PointCut可定位到<code>MainActivity</code>中任一方法的内部执行的类型的<code>JoinPoint</code>。 <br>
+接下来，编写真正要织入的代码：</p>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-aspectj hljs"><span class="hljs-annotation">@Around</span>(<span class="hljs-string">"method()"</span>)<br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">onPreMethod</span><span class="hljs-params">(ProceedingJoinPoint joinPoint)</span><span class="hljs-keyword">throws</span> Throwable</span>{<br>        Log.i(TAG,joinPoint.getSignature().getName()+<span class="hljs-string">" --&gt;start"</span>);<br>        <span class="hljs-keyword">long</span> startNanos = System.nanoTime();<br>        Object result = joinPoint.<span class="hljs-keyword">proceed</span>();<br>        <span class="hljs-keyword">long</span> stopNanos = System.nanoTime();<br>        <span class="hljs-keyword">long</span> lengthMillis = TimeUnit.NANOSECONDS.toMillis(stopNanos - startNanos);<br>        Log.i(TAG,joinPoint.getSignature().getName()+<span class="hljs-string">"--&gt;end execute time total : "</span>+lengthMillis+<span class="hljs-string">"ms"</span>)<br>    }<br></code></pre>
+
+<p>这个advice使用了<code>@Around("method()")</code>注解，其中的<code>method()</code>便是上文定义的PointCut，Around,顾名思义，即包围，在这个函数内部执行的前后，该注解修饰的方法就是具体执行的代码，参数为固定的<code>ProceedingJoinPoint</code>，在该函数内部又这么一条<code>Object result = joinPoint.proceed();</code> 这条表示调用原函数自己的是实现，返回的result也是原函数的返回值，我们就可以在这个函数的前后添加需要的功能了，比如日志记录和耗时计算。如果不调用这一句，则原函数便不会执行了。另外，通过这个<code>JoinPoint</code>参数，可以获取到该方法的签名对象以及该方法的调用者对象，再通过反射，可以实现更多的功能，可以自行探索。除了@Around，还提供了@Before，@After，不过这两个一般可以被@Around所代替，所以不展开，具体用法一样，只是参数类型变为JoinPoint。</p>
+
+<p>至此，就完成了一个简单的完整的AspectJ应用,可以满足基本的需求了。</p>
+
+<p>上文所述是基于方法的对JoinPoint的代码织入，还有基于构造方法的，基于类的成员变量的。 <br>
+以下是一个基于成员变量的例子,对该变量的赋值的<code>joinPoint</code>织入： <br>
+首先在<code>MainActivit</code>中声明一个变量<code>int i ;</code>，在<code>onCreate()</code>中赋值<code>i = 3;</code>,接下来编写<code>aspectj</code>代码,</p>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-aspectj hljs"><span class="hljs-annotation">@Pointcut</span>(<span class="hljs-string">"set(int com.github.huangyouqiang.aspectjlibrary.databindingdemo.MainActivity.i) &amp;&amp; args(i)"</span>)<br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">seti</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span></span>{}<br><br><span class="hljs-annotation">@Before</span>(<span class="hljs-string">"seti(i)"</span>)<br> <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">beforeI</span><span class="hljs-params">(JoinPoint joinPoint,<span class="hljs-keyword">int</span> i)</span></span>{<br>     FieldSignature signature = (FieldSignature) joinPoint.getSignature();<br>     System.out.println(joinPoint.getStaticPart().getSourceLocation());<br>     System.out.println(signature.getName()+ <span class="hljs-string">" = "</span>+i);<br> }<br></code></pre>
+
+
+
+<h3 id="参考文献深入理解android之aop">参考文献：<a href="http://blog.csdn.net/innost/article/details/49387395" target="_blank">深入理解Android之AOP</a></h3></div></body></html>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/06/Android 4.4 以上沉浸式状态栏实现/" rel="next" title="Android 4.4 以上沉浸式状态栏实现">
+                <i class="fa fa-chevron-left"></i> Android 4.4 以上沉浸式状态栏实现
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/09/29/Android Studio 使用 AspectJ 实践AOP/"
+     data-title="Android Studio 使用 AspectJ 实践AOP"
+     data-content=""
+     data-url="http://vinci2015.github.io/2016/09/29/Android Studio 使用 AspectJ 实践AOP/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/09/29/Android Studio 使用 AspectJ 实践AOP/"
+           data-title="Android Studio 使用 AspectJ 实践AOP" data-url="http://vinci2015.github.io/2016/09/29/Android Studio 使用 AspectJ 实践AOP/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="vinci huang" />
+          <p class="site-author-name" itemprop="name">vinci huang</p>
+          <p class="site-description motion-element" itemprop="description">coder the world</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用"><span class="nav-number">2.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献深入理解android之aop"><span class="nav-number">3.</span> <span class="nav-text">参考文献：深入理解Android之AOP</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">vinci huang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user">本站访客数</i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span>人次</span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye">本站总访问量</i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span>次</span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"vinci2015"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

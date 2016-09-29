@@ -238,6 +238,234 @@
             
               
                 
+                <a class="post-title-link" href="/2016/09/29/Android Studio 使用 AspectJ 实践AOP/" itemprop="url">
+                  Android Studio 使用 AspectJ 实践AOP
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-29T22:39:03+08:00" content="2016-09-29">
+              2016-09-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/android/" itemprop="url" rel="index">
+                    <span itemprop="name">android</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/29/Android Studio 使用 AspectJ 实践AOP/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/29/Android Studio 使用 AspectJ 实践AOP/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <!DOCTYPE html><html><head><title>Android Studio 使用 AspectJ 实践AOP</title><meta charset="utf-8"><link href="https://dn-maxiang.qbox.me/res-min/themes/marxico.css" rel="stylesheet"><style></style></head><body><div id="preview-contents" class="note-content">
+                        
+                    
+
+
+<p> <br>
+Android Studio   官方暂时不支持aspectJ，不过这里用的一款<code>gradle</code>插件 <code>aspectjx</code></p>
+
+
+
+<h3 id="配置"><em>配置</em></h3>
+
+<ol start="1"><li rel="1">在project的build.gradle里配置插件</li>
+</ol>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-gradle hljs">     <span class="hljs-keyword">dependencies</span> {<br>        <span class="hljs-keyword">classpath</span> <span class="hljs-string">'com.android.tools.build:gradle:2.1.3'</span><br>        <span class="hljs-comment">//if i update the gradle plugin version above to 2.2.0,it will runs out with a problerm</span><br>        <span class="hljs-keyword">classpath</span> <span class="hljs-string">'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:1.0.7'</span><br>    }<br></code></pre>
+
+<ol start="2"><li rel="2">在主module中添加 <code>apply plugin:'android-aspectjx'</code>,在<code>android</code>闭包中添加</li>
+</ol>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-gradle hljs">  aspectjx {<br>        <span class="hljs-comment">//指定只对含有关键字'DataBindingDemo/aspectjlibrary'的库进行织入扫描，忽略其他库，提升编译效率</span><br>        includeJarFilter <span class="hljs-string">'DataBindingDemo/aspectjlibrary'</span><br>        <span class="hljs-comment">//排除对universal-image-loader'库的织入扫描</span><br>        <span class="hljs-comment">//  excludeJarFilter 'universal-image-loader' </span><br>    }<br></code></pre>
+
+<ol start="3"><li rel="3">在使用了<code>aspectj</code> 的module中添加一下依赖：</li>
+</ol>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-gradle hljs"> <span class="hljs-keyword">compile</span> <span class="hljs-string">'org.aspectj:aspectjrt:1.8.9'</span><br></code></pre>
+
+
+
+<h3 id="应用"><em>应用</em></h3>
+
+<p><code>aspect</code> 主要用于AOP编程，应用在日志，监控，性能检查方面，并可以做到<strong>无侵入</strong>。 <br>
+首先是3个概念： <br>
+ <strong>JoinPoint</strong> ：表示程序运行过程中的一些执行点，包括函数调用，函数内部执行等。。。 <br>
+ <strong>PointCut</strong> :   用于定位到指定的<code>JoinPoint</code> <br>
+ <strong>Advice</strong>   :  要织入到指定位置的代码片段</p>
+
+<p>新建一个Module，专门用于编写Aspectj代码，将该Module申明成<code>android library</code>,主Module中添加该依赖库。 <br>
+新建一个类 <code>ActivityAspect</code>,在类名上添加注解<code>@Aspect</code>。声明一个<code>PointCut</code>:</p>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-aspectj hljs"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> String MainMethod = <span class="hljs-string">"* com.github.huangyouqiang.aspectjlibrary.databindingdemo.MainActivity.*(..)"</span><br><span class="hljs-annotation">@Pointcut</span>(<span class="hljs-string">"execution(MainMethod)"</span>)<br><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">mainmethod</span><span class="hljs-params">()</span></span>{}<br></code></pre>
+
+<p>其中MainMethod表示匹配<code>MainActivity</code>中的所有方法。具体语法如下：</p>
+
+<blockquote>
+  <p><code>Method Signature</code>: <br>
+    语法： @注解 访问权限 返回值的类型 包名.函数名(参数) <br>
+  @注解 和 访问权限public/private/protect，以及static/final）属于可选项。如果不设置它们，则默认都会选择。以访问权限       为例，如果没有设置访问权限作为条件，那么public，private，protect及static、final的函数都会进行搜索。 <br>
+    返回值类型就是普通的函数的返回值类型。如果不限定类型的话，就用*通配符表示 <br>
+  Ž  包名.函数名用于查找匹配的函数。可以使用通配符，包括<em>和..以及+号。其中</em>号用于匹配除.号之外的任意字符，而..则表示任   意子package，+号表示子类。 <br>
+       比如： <br>
+       java.*.Date：可以表示java.sql.Date，也可以表示java.util.Date <br>
+       Test*：可以表示TestBase，也可以表示TestDervied <br>
+       java..*：表示java任意子类 <br>
+       java..*Model+：表示Java任意package中名字以Model结尾的子类，比如TabelModel，TreeModel等 <br>
+    最后来看函数的参数。参数匹配比较简单，主要是参数类型，比如： <br>
+       (int, char)：表示参数只有两个，并且第一个参数类型是int，第二个参数类型是char <br>
+       (String, ..)：表示至少有一个参数。并且第一个参数类型是String，后面参数类型不限。在参数匹配中， <br>
+       ..代表任意参数个数和类型 <br>
+       (Object …)：表示不定个数的参数，且类型都是Object，这里的…不是通配符，而是Java中代表不定参数的意思  <br>
+  <code>Constructor signature</code>: <br>
+  和Method Signature类似，只不过构造函数没有返回值，而且函数名必须叫new。比如： <br>
+  public *..TestDerived.new(..)： <br>
+  Œ  public：选择public访问权限 <br>
+    *..代表任意包名 <br>
+  Ž  TestDerived.new：代表TestDerived的构造函数 <br>
+    (..)：代表参数个数和类型都是任意 <br>
+  <code>Field Signature</code>： <br>
+  @注解 访问权限 类型 类名.成员变量名 <br>
+  Œ  其中，@注解和访问权限是可选的 <br>
+    类型：成员变量类型，*代表任意类型 <br>
+  Ž  类名.成员变量名：成员变量名可以是*，代表任意成员变量 <br>
+  比如， <br>
+  set(int test..TestBase.base)：表示设置TestBase.base变量时的JPoint <br>
+  <code>Type Signature</code>:  <br>
+  staticinitialization(test..TestBase)：表示TestBase类的static block <br>
+  handler(NullPointerException)：表示catch到NullPointerException的JPoint.</p>
+</blockquote>
+
+<p><code>@Pointcut()</code>定义了一个PointCut，注解了一个方法<code>public void mainmethod(){}</code>,此处这个方法不需要具体实现，此方法变代表了这个PointCut，下面会用到。<code>execution</code>表示为该匹配为该函数类型的<code>JoinPoint</code>的内部执行。 <br>
+结合上述的解释，可以得出该PointCut可定位到<code>MainActivity</code>中任一方法的内部执行的类型的<code>JoinPoint</code>。 <br>
+接下来，编写真正要织入的代码：</p>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-aspectj hljs"><span class="hljs-annotation">@Around</span>(<span class="hljs-string">"method()"</span>)<br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">onPreMethod</span><span class="hljs-params">(ProceedingJoinPoint joinPoint)</span><span class="hljs-keyword">throws</span> Throwable</span>{<br>        Log.i(TAG,joinPoint.getSignature().getName()+<span class="hljs-string">" --&gt;start"</span>);<br>        <span class="hljs-keyword">long</span> startNanos = System.nanoTime();<br>        Object result = joinPoint.<span class="hljs-keyword">proceed</span>();<br>        <span class="hljs-keyword">long</span> stopNanos = System.nanoTime();<br>        <span class="hljs-keyword">long</span> lengthMillis = TimeUnit.NANOSECONDS.toMillis(stopNanos - startNanos);<br>        Log.i(TAG,joinPoint.getSignature().getName()+<span class="hljs-string">"--&gt;end execute time total : "</span>+lengthMillis+<span class="hljs-string">"ms"</span>)<br>    }<br></code></pre>
+
+<p>这个advice使用了<code>@Around("method()")</code>注解，其中的<code>method()</code>便是上文定义的PointCut，Around,顾名思义，即包围，在这个函数内部执行的前后，该注解修饰的方法就是具体执行的代码，参数为固定的<code>ProceedingJoinPoint</code>，在该函数内部又这么一条<code>Object result = joinPoint.proceed();</code> 这条表示调用原函数自己的是实现，返回的result也是原函数的返回值，我们就可以在这个函数的前后添加需要的功能了，比如日志记录和耗时计算。如果不调用这一句，则原函数便不会执行了。另外，通过这个<code>JoinPoint</code>参数，可以获取到该方法的签名对象以及该方法的调用者对象，再通过反射，可以实现更多的功能，可以自行探索。除了@Around，还提供了@Before，@After，不过这两个一般可以被@Around所代替，所以不展开，具体用法一样，只是参数类型变为JoinPoint。</p>
+
+<p>至此，就完成了一个简单的完整的AspectJ应用,可以满足基本的需求了。</p>
+
+<p>上文所述是基于方法的对JoinPoint的代码织入，还有基于构造方法的，基于类的成员变量的。 <br>
+以下是一个基于成员变量的例子,对该变量的赋值的<code>joinPoint</code>织入： <br>
+首先在<code>MainActivit</code>中声明一个变量<code>int i ;</code>，在<code>onCreate()</code>中赋值<code>i = 3;</code>,接下来编写<code>aspectj</code>代码,</p>
+
+
+
+<pre class="prettyprint hljs-dark"><code class="language-aspectj hljs"><span class="hljs-annotation">@Pointcut</span>(<span class="hljs-string">"set(int com.github.huangyouqiang.aspectjlibrary.databindingdemo.MainActivity.i) &amp;&amp; args(i)"</span>)<br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">seti</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span></span>{}<br><br><span class="hljs-annotation">@Before</span>(<span class="hljs-string">"seti(i)"</span>)<br> <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">beforeI</span><span class="hljs-params">(JoinPoint joinPoint,<span class="hljs-keyword">int</span> i)</span></span>{<br>     FieldSignature signature = (FieldSignature) joinPoint.getSignature();<br>     System.out.println(joinPoint.getStaticPart().getSourceLocation());<br>     System.out.println(signature.getName()+ <span class="hljs-string">" = "</span>+i);<br> }<br></code></pre>
+
+
+
+<h3 id="参考文献深入理解android之aop">参考文献：<a href="http://blog.csdn.net/innost/article/details/49387395" target="_blank">深入理解Android之AOP</a></h3></div></body></html>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/09/06/Android 4.4 以上沉浸式状态栏实现/" itemprop="url">
                   Android 4.4 以上沉浸式状态栏实现
                 </a>
@@ -850,7 +1078,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
